@@ -42,7 +42,7 @@ fun DefaultTextField(
     keyboardActions: KeyboardActions,
     cornerSize: Dp = dimensionResource(com.intuit.sdp.R.dimen._12sdp)
 ) {
-    val _16ssp = dimensionResource(com.intuit.ssp.R.dimen._16ssp).value.sp
+    val _12ssp = dimensionResource(com.intuit.ssp.R.dimen._12ssp).value.sp
 
     var value by remember { mutableStateOf("") }
     TextField(
@@ -51,14 +51,14 @@ fun DefaultTextField(
         modifier = modifier,
         shape = RoundedCornerShape(cornerSize),
         textStyle = TextStyle(
-            fontSize = _16ssp,
+            fontSize = _12ssp,
             color = Color.Black,
             fontFamily = FontFamily(Font(R.font.poppins_regular))
         ),
         placeholder = {
             Text(
                 text = placeholder,
-                fontSize = _16ssp,
+                fontSize = _12ssp,
                 color = Gray,
                 fontFamily = FontFamily(Font(R.font.poppins_regular))
             )

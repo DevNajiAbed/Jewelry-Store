@@ -27,7 +27,7 @@ fun DefaultButton(
     val _20sdp = dimensionResource(com.intuit.sdp.R.dimen._20sdp)
     val _5sdp = dimensionResource(com.intuit.sdp.R.dimen._5sdp)
 
-    val _16ssp = dimensionResource(com.intuit.ssp.R.dimen._16ssp).value.sp
+    val _12ssp = dimensionResource(com.intuit.ssp.R.dimen._12ssp).value.sp
 
     Button(
         onClick = onClick,
@@ -45,7 +45,7 @@ fun DefaultButton(
                     top = _5sdp, bottom = _5sdp
                 ),
             color = Color.Black,
-            fontSize = _16ssp,
+            fontSize = _12ssp,
             fontFamily = FontFamily(Font(R.font.poppins_regular))
         )
     }

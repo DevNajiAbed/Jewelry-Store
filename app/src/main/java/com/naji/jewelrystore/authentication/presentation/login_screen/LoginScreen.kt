@@ -2,6 +2,7 @@ package com.naji.jewelrystore.authentication.presentation.login_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,9 +37,9 @@ import com.naji.jewelrystore.core.presenetation.ui.theme.Secondary
 
 @Preview(showSystemUi = true)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(modifier: Modifier = Modifier) {
     ConstraintLayout(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Secondary.copy(alpha = 0.5f))
     ) {
@@ -51,6 +54,7 @@ fun LoginScreen() {
         ) = createRefs()
 
         val _100sdp = dimensionResource(com.intuit.sdp.R.dimen._100sdp)
+        val _80sdp = dimensionResource(com.intuit.sdp.R.dimen._80sdp)
         val _16sdp = dimensionResource(com.intuit.sdp.R.dimen._16sdp)
         val _8sdp = dimensionResource(com.intuit.sdp.R.dimen._8sdp)
         val _50sdp = dimensionResource(com.intuit.sdp.R.dimen._50sdp)
@@ -63,7 +67,7 @@ fun LoginScreen() {
             contentDescription = "App's logo",
             modifier = Modifier
                 .constrainAs(logo) {
-                    top.linkTo(parent.top, margin = _100sdp)
+                    top.linkTo(parent.top, margin = _80sdp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }.size(_100sdp)
@@ -77,7 +81,7 @@ fun LoginScreen() {
                     start.linkTo(parent.start, margin = _16sdp)
                 },
             fontWeight = FontWeight.Bold,
-            fontSize = _16ssp,
+            fontSize = _12ssp,
             color = Color.Black.copy(0.75f)
         )
         DefaultTextField(
@@ -105,11 +109,11 @@ fun LoginScreen() {
                     start.linkTo(parent.start, margin = _16sdp)
                 },
             fontWeight = FontWeight.Bold,
-            fontSize = _16ssp,
+            fontSize = _12ssp,
             color = Color.Black.copy(0.75f)
         )
         DefaultTextField(
-            icon = Icons.Default.Person,
+            icon = ImageVector.vectorResource(R.drawable.ic_key),
             placeholder = "Password",
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -157,7 +161,11 @@ fun LoginScreen() {
                 text = "Sign up",
                 color = Primary,
                 fontSize = _12ssp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable {
+
+                    }
             )
         }
     }

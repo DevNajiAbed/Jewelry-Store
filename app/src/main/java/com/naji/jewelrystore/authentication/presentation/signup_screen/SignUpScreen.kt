@@ -1,7 +1,9 @@
 package com.naji.jewelrystore.authentication.presentation.signup_screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,13 +15,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,28 +39,30 @@ import com.naji.jewelrystore.core.presenetation.ui.theme.Secondary
 
 @Preview
 @Composable
-private fun SignUpScreen() {
+fun SignUpScreen(modifier: Modifier = Modifier) {
     ConstraintLayout(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Secondary.copy(alpha = 0.5f))
     ) {
         val (
             logo,
+            emailTitle,
+            emailField,
             usernameTitle,
             usernameField,
             passwordTitle,
             passwordField,
-            loginBtn,
-            signUpSection
+            signUpBtn,
+            signInSection
         ) = createRefs()
 
         val _100sdp = dimensionResource(com.intuit.sdp.R.dimen._100sdp)
+        val _80sdp = dimensionResource(com.intuit.sdp.R.dimen._80sdp)
         val _16sdp = dimensionResource(com.intuit.sdp.R.dimen._16sdp)
         val _8sdp = dimensionResource(com.intuit.sdp.R.dimen._8sdp)
         val _50sdp = dimensionResource(com.intuit.sdp.R.dimen._50sdp)
 
-        val _16ssp = dimensionResource(com.intuit.ssp.R.dimen._16ssp).value.sp
         val _12ssp = dimensionResource(com.intuit.ssp.R.dimen._12ssp).value.sp
 
         Image(
@@ -63,26 +70,54 @@ private fun SignUpScreen() {
             contentDescription = "App's logo",
             modifier = Modifier
                 .constrainAs(logo) {
-                    top.linkTo(parent.top, margin = _100sdp)
+                    top.linkTo(parent.top, margin = _80sdp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }.size(_100sdp)
         )
 
         Text(
-            text = "Username",
+            text = "Email",
             modifier = Modifier
-                .constrainAs(usernameTitle) {
+                .constrainAs(emailTitle) {
                     top.linkTo(logo.bottom, margin = _50sdp)
                     start.linkTo(parent.start, margin = _16sdp)
                 },
             fontWeight = FontWeight.Bold,
-            fontSize = _16ssp,
+            fontSize = _12ssp,
+            color = Color.Black.copy(0.75f)
+        )
+        DefaultTextField(
+            icon = Icons.Default.Email,
+            placeholder = "Email",
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions.Default,
+            modifier = Modifier
+                .constrainAs(emailField) {
+                    top.linkTo(emailTitle.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }.fillMaxWidth()
+                .padding(_8sdp)
+        )
+
+        Text(
+            text = "Your name",
+            modifier = Modifier
+                .constrainAs(usernameTitle) {
+                    top.linkTo(emailField.bottom, margin = _16sdp)
+                    start.linkTo(parent.start, margin = _16sdp)
+                },
+            fontWeight = FontWeight.Bold,
+            fontSize = _12ssp,
             color = Color.Black.copy(0.75f)
         )
         DefaultTextField(
             icon = Icons.Default.Person,
-            placeholder = "Username",
+            placeholder = "Your name",
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -105,11 +140,11 @@ private fun SignUpScreen() {
                     start.linkTo(parent.start, margin = _16sdp)
                 },
             fontWeight = FontWeight.Bold,
-            fontSize = _16ssp,
+            fontSize = _12ssp,
             color = Color.Black.copy(0.75f)
         )
         DefaultTextField(
-            icon = Icons.Default.Person,
+            icon = ImageVector.vectorResource(R.drawable.ic_key),
             placeholder = "Password",
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -127,20 +162,20 @@ private fun SignUpScreen() {
 
         DefaultButton(
             modifier = Modifier
-                .constrainAs(loginBtn) {
+                .constrainAs(signUpBtn) {
                     top.linkTo(passwordField.bottom, margin = _50sdp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
-            text = "Sign in",
+            text = "Sign up",
             onClick = {
-
+                Log.i("nji", "Clicked!")
             }
         )
 
         Row(
             modifier = Modifier
-                .constrainAs(signUpSection) {
+                .constrainAs(signInSection) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom, margin = _16sdp)
@@ -148,16 +183,20 @@ private fun SignUpScreen() {
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Don't have an account?",
+                text = "Already have an account?",
                 color = Color.Black,
                 fontSize = _12ssp
             )
             Spacer(modifier = Modifier.width(_8sdp))
             Text(
-                text = "Sign up",
+                text = "Sign in",
                 color = Primary,
                 fontSize = _12ssp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier
+                    .clickable {
+
+                    }
             )
         }
     }
