@@ -1,4 +1,4 @@
-package com.naji.jewelrystore.authentication.presentation.login_screen
+package com.naji.jewelrystore.authentication.presentation.signup_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,9 +32,9 @@ import com.naji.jewelrystore.core.presenetation.components.DefaultTextField
 import com.naji.jewelrystore.core.presenetation.ui.theme.Primary
 import com.naji.jewelrystore.core.presenetation.ui.theme.Secondary
 
-@Preview(showSystemUi = true)
+@Preview
 @Composable
-fun LoginScreen() {
+private fun SignUpScreen() {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
