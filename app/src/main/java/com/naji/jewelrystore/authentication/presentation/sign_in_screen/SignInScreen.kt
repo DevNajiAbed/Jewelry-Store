@@ -1,4 +1,4 @@
-package com.naji.jewelrystore.authentication.presentation.login_screen
+package com.naji.jewelrystore.authentication.presentation.sign_in_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,27 +17,50 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.naji.jewelrystore.R
 import com.naji.jewelrystore.core.presenetation.components.DefaultButton
 import com.naji.jewelrystore.core.presenetation.components.DefaultTextField
 import com.naji.jewelrystore.core.presenetation.ui.theme.Primary
 import com.naji.jewelrystore.core.presenetation.ui.theme.Secondary
 
-@Preview(showSystemUi = true)
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun SignInScreen(
+    modifier: Modifier = Modifier,
+    viewModel: SignInViewModel = hiltViewModel()
+) {
+    val state = viewModel.state.collectAsState()
+    val uiAction = viewModel.uiAction
+
+    SignInScreen(
+        modifier = modifier,
+        state = state,
+        onAction = viewModel::onAction
+    )
+}
+
+@Composable
+private fun SignInScreen(
+    modifier: Modifier,
+    state: State<SignInScreenState>,
+    onAction: (SignInScreenAction) -> Unit
+) {
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
@@ -49,7 +72,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             usernameField,
             passwordTitle,
             passwordField,
-            loginBtn,
+            signInBtn,
             signUpSection
         ) = createRefs()
 
@@ -59,8 +82,11 @@ fun LoginScreen(modifier: Modifier = Modifier) {
         val _8sdp = dimensionResource(com.intuit.sdp.R.dimen._8sdp)
         val _50sdp = dimensionResource(com.intuit.sdp.R.dimen._50sdp)
 
-        val _16ssp = dimensionResource(com.intuit.ssp.R.dimen._16ssp).value.sp
         val _12ssp = dimensionResource(com.intuit.ssp.R.dimen._12ssp).value.sp
+
+        val usernameFocusRequester = FocusRequester()
+        val passwordFocusRequester = FocusRequester()
+        val focusManager = LocalFocusManager.current
 
         Image(
             painter = painterResource(R.drawable.logo),
@@ -70,7 +96,8 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                     top.linkTo(parent.top, margin = _80sdp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }.size(_100sdp)
+                }
+                .size(_100sdp)
         )
 
         Text(
@@ -87,18 +114,28 @@ fun LoginScreen(modifier: Modifier = Modifier) {
         DefaultTextField(
             icon = Icons.Default.Person,
             placeholder = "Username",
+            value = state.value.username,
+            onValueChange = {
+                onAction(SignInScreenAction.OnUsernameChange(it))
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
             ),
-            keyboardActions = KeyboardActions.Default,
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    passwordFocusRequester.requestFocus()
+                }
+            ),
             modifier = Modifier
                 .constrainAs(usernameField) {
                     top.linkTo(usernameTitle.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }.fillMaxWidth()
+                }
+                .fillMaxWidth()
                 .padding(_8sdp)
+                .focusRequester(usernameFocusRequester)
         )
 
         Text(
@@ -115,30 +152,41 @@ fun LoginScreen(modifier: Modifier = Modifier) {
         DefaultTextField(
             icon = ImageVector.vectorResource(R.drawable.ic_key),
             placeholder = "Password",
+            value = state.value.password,
+            onValueChange = {
+                onAction(SignInScreenAction.OnPasswordChange(it))
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Go
             ),
-            keyboardActions = KeyboardActions.Default,
+            keyboardActions = KeyboardActions(
+                onGo = {
+                    focusManager.clearFocus()
+                    onAction(SignInScreenAction.PerformSignIn)
+                }
+            ),
             modifier = Modifier
                 .constrainAs(passwordField) {
                     top.linkTo(passwordTitle.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }.fillMaxWidth()
+                }
+                .fillMaxWidth()
                 .padding(_8sdp)
+                .focusRequester(passwordFocusRequester)
         )
 
         DefaultButton(
             modifier = Modifier
-                .constrainAs(loginBtn) {
+                .constrainAs(signInBtn) {
                     top.linkTo(passwordField.bottom, margin = _50sdp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 },
             text = "Sign in",
             onClick = {
-
+                onAction(SignInScreenAction.PerformSignIn)
             }
         )
 

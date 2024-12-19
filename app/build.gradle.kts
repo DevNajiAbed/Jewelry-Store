@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.google.dagger.hilt.android)
 }
 
 android {
@@ -64,6 +66,12 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
 
     // Intuit
-    implementation("com.intuit.sdp:sdp-android:1.1.1")
-    implementation("com.intuit.ssp:ssp-android:1.1.1")
+    implementation(libs.sdp.android)
+    implementation(libs.ssp.android)
+
+    // hilt
+    implementation(libs.dagger.hilt)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.navigation)
+    implementation(libs.androidx.navigation.runtime.ktx)
 }

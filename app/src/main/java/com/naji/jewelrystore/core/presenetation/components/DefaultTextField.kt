@@ -37,6 +37,8 @@ fun DefaultTextField(
     modifier: Modifier = Modifier,
     icon: ImageVector,
     contentDescription: String? = null,
+    value: String,
+    onValueChange: (String) -> Unit,
     placeholder: String,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
@@ -44,10 +46,11 @@ fun DefaultTextField(
 ) {
     val _12ssp = dimensionResource(com.intuit.ssp.R.dimen._12ssp).value.sp
 
-    var value by remember { mutableStateOf("") }
     TextField(
         value = value,
-        onValueChange = { value = it },
+        onValueChange = {
+            onValueChange(it)
+        },
         modifier = modifier,
         shape = RoundedCornerShape(cornerSize),
         textStyle = TextStyle(
@@ -91,6 +94,8 @@ private fun PreviewDefaultTextField() {
             keyboardType = KeyboardType.Email,
             imeAction = ImeAction.Go
         ),
-        keyboardActions = KeyboardActions.Default
+        keyboardActions = KeyboardActions.Default,
+        onValueChange = {},
+        value = ""
     )
 }

@@ -1,6 +1,5 @@
 package com.naji.jewelrystore.authentication.presentation.signup_screen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +18,8 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -28,18 +29,36 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.naji.jewelrystore.R
 import com.naji.jewelrystore.core.presenetation.components.DefaultButton
 import com.naji.jewelrystore.core.presenetation.components.DefaultTextField
 import com.naji.jewelrystore.core.presenetation.ui.theme.Primary
 import com.naji.jewelrystore.core.presenetation.ui.theme.Secondary
 
-@Preview
 @Composable
-fun SignUpScreen(modifier: Modifier = Modifier) {
+fun SignUpScreen(
+    modifier: Modifier = Modifier,
+    viewModel: SignUpViewModel = hiltViewModel()
+) {
+    val state = viewModel.state.collectAsState()
+    val uiAction = viewModel.uiAction
+
+    SignUpScreen(
+        modifier = modifier,
+        state = state,
+        onAction = viewModel::onAction
+    )
+}
+
+@Composable
+private fun SignUpScreen(
+    modifier: Modifier,
+    state: State<SignUpScreenState>,
+    onAction: (SignUpScreenAction) -> Unit
+) {
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
@@ -73,7 +92,8 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     top.linkTo(parent.top, margin = _80sdp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }.size(_100sdp)
+                }
+                .size(_100sdp)
         )
 
         Text(
@@ -90,6 +110,10 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
         DefaultTextField(
             icon = Icons.Default.Email,
             placeholder = "Email",
+            value = state.value.email,
+            onValueChange = {
+                onAction(SignUpScreenAction.OnEmailChange(it))
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -100,7 +124,8 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     top.linkTo(emailTitle.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }.fillMaxWidth()
+                }
+                .fillMaxWidth()
                 .padding(_8sdp)
         )
 
@@ -118,6 +143,10 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
         DefaultTextField(
             icon = Icons.Default.Person,
             placeholder = "Your name",
+            value = state.value.username,
+            onValueChange = {
+                onAction(SignUpScreenAction.OnUsernameChange(it))
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next
@@ -128,7 +157,8 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     top.linkTo(usernameTitle.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }.fillMaxWidth()
+                }
+                .fillMaxWidth()
                 .padding(_8sdp)
         )
 
@@ -146,6 +176,10 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
         DefaultTextField(
             icon = ImageVector.vectorResource(R.drawable.ic_key),
             placeholder = "Password",
+            value = state.value.password,
+            onValueChange = {
+                onAction(SignUpScreenAction.OnPasswordChange(it))
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Go
@@ -156,7 +190,8 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                     top.linkTo(passwordTitle.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                }.fillMaxWidth()
+                }
+                .fillMaxWidth()
                 .padding(_8sdp)
         )
 
@@ -169,7 +204,7 @@ fun SignUpScreen(modifier: Modifier = Modifier) {
                 },
             text = "Sign up",
             onClick = {
-                Log.i("nji", "Clicked!")
+                onAction(SignUpScreenAction.PerformSignUp)
             }
         )
 
