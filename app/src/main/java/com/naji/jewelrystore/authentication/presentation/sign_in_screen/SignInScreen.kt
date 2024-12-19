@@ -1,5 +1,6 @@
 package com.naji.jewelrystore.authentication.presentation.sign_in_screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,7 +25,9 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -39,19 +42,33 @@ import com.naji.jewelrystore.core.presenetation.components.DefaultButton
 import com.naji.jewelrystore.core.presenetation.components.DefaultTextField
 import com.naji.jewelrystore.core.presenetation.ui.theme.Primary
 import com.naji.jewelrystore.core.presenetation.ui.theme.Secondary
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.material3.CircularProgressIndicator
 
 @Composable
 fun SignInScreen(
     modifier: Modifier = Modifier,
-    viewModel: SignInViewModel = hiltViewModel()
+    viewModel: SignInViewModel = hiltViewModel(),
+    navigateToHomeScreen: () -> Unit = {},
+    navigateToSignUpScreen: () -> Unit = {},
+    onNavigationBarVisibilityChange: (Boolean) -> Unit
 ) {
+    // Hide the NavigationBar
+    onNavigationBarVisibilityChange(false)
+
     val state = viewModel.state.collectAsState()
     val uiAction = viewModel.uiAction
 
     SignInScreen(
         modifier = modifier,
         state = state,
-        onAction = viewModel::onAction
+        uiAction = uiAction,
+        onAction = viewModel::onAction,
+        navigateToHomeScreen = navigateToHomeScreen,
+        navigateToSignUpScreen = navigateToSignUpScreen,
+        onNavigationBarVisibilityChange = onNavigationBarVisibilityChange
     )
 }
 
@@ -59,8 +76,29 @@ fun SignInScreen(
 private fun SignInScreen(
     modifier: Modifier,
     state: State<SignInScreenState>,
-    onAction: (SignInScreenAction) -> Unit
+    uiAction: SharedFlow<SignInViewModel.UiAction>,
+    onAction: (SignInScreenAction) -> Unit,
+    navigateToHomeScreen: () -> Unit,
+    navigateToSignUpScreen: () -> Unit,
+    onNavigationBarVisibilityChange: (Boolean) -> Unit
 ) {
+    val context = LocalContext.current
+
+    LaunchedEffect(true) {
+        uiAction.collectLatest{ action ->
+            when(action) {
+                is SignInViewModel.UiAction.ShowToast -> {
+                    Toast.makeText(context, action.message, Toast.LENGTH_SHORT).show()
+                }
+                SignInViewModel.UiAction.OnSignInSuccess -> {
+                    // Show the NavigationBar when we close SignUpScreen
+                    onNavigationBarVisibilityChange(true)
+                    navigateToHomeScreen()
+                }
+            }
+        }
+    }
+
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
@@ -73,7 +111,8 @@ private fun SignInScreen(
             passwordTitle,
             passwordField,
             signInBtn,
-            signUpSection
+            signUpSection,
+            loadingIndicator
         ) = createRefs()
 
         val _100sdp = dimensionResource(com.intuit.sdp.R.dimen._100sdp)
@@ -86,7 +125,7 @@ private fun SignInScreen(
 
         val usernameFocusRequester = FocusRequester()
         val passwordFocusRequester = FocusRequester()
-        val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
 
         Image(
             painter = painterResource(R.drawable.logo),
@@ -162,8 +201,7 @@ private fun SignInScreen(
             ),
             keyboardActions = KeyboardActions(
                 onGo = {
-                    focusManager.clearFocus()
-                    onAction(SignInScreenAction.PerformSignIn)
+                    keyboardController?.hide()
                 }
             ),
             modifier = Modifier
@@ -177,6 +215,19 @@ private fun SignInScreen(
                 .focusRequester(passwordFocusRequester)
         )
 
+        if(state.value.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .constrainAs(loadingIndicator) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        top.linkTo(passwordField.bottom)
+                        bottom.linkTo(signInBtn.top)
+                    },
+                color = Primary
+            )
+        }
+
         DefaultButton(
             modifier = Modifier
                 .constrainAs(signInBtn) {
@@ -186,7 +237,8 @@ private fun SignInScreen(
                 },
             text = "Sign in",
             onClick = {
-                onAction(SignInScreenAction.PerformSignIn)
+                if(!state.value.isLoading)
+                    onAction(SignInScreenAction.PerformSignIn)
             }
         )
 
@@ -212,7 +264,9 @@ private fun SignInScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .clickable {
-
+                        // Show the NavigationBar when we close SignUpScreen
+                        onNavigationBarVisibilityChange(true)
+                        navigateToSignUpScreen()
                     }
             )
         }

@@ -80,7 +80,8 @@ fun DefaultTextField(
             unfocusedIndicatorColor = Color.Transparent,
             focusedContainerColor = Color.White,
             unfocusedContainerColor = Color.White
-        )
+        ),
+        singleLine = true
     )
 }
 

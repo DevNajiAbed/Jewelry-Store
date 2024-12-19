@@ -1,5 +1,6 @@
 package com.naji.jewelrystore.authentication.domain.use_cases
 
+import android.util.Log
 import com.naji.jewelrystore.core.domain.repository.AuthenticationRepository
 import com.naji.jewelrystore.core.data.Result
 import kotlinx.coroutines.flow.Flow
@@ -12,11 +13,8 @@ class SignInUseCase @Inject constructor(
     operator fun invoke(username: String, password: String): Flow<Result<Boolean>> {
         return flow {
             emit(Result.Loading())
-            when(val result = authenticationRepository.signIn(username, password)) {
-                is Result.Success -> emit(result)
-                is Result.Failure -> emit(result)
-                is Result.Loading -> Unit
-            }
+            val result = authenticationRepository.signIn(username, password)
+            emit(result)
         }
     }
 }

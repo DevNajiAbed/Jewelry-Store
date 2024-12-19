@@ -22,7 +22,9 @@ fun DefaultButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     text: String,
-    cornerSize: Dp = dimensionResource(com.intuit.sdp.R.dimen._12sdp)
+    cornerSize: Dp = dimensionResource(com.intuit.sdp.R.dimen._12sdp),
+    fontColor: Color = Color.Black,
+    backgroundColor: Color = Color.White
 ) {
     val _20sdp = dimensionResource(com.intuit.sdp.R.dimen._20sdp)
     val _5sdp = dimensionResource(com.intuit.sdp.R.dimen._5sdp)
@@ -33,7 +35,7 @@ fun DefaultButton(
         onClick = onClick,
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White
+            containerColor = backgroundColor
         ),
         shape = RoundedCornerShape(cornerSize)
     ) {
@@ -44,7 +46,7 @@ fun DefaultButton(
                     start = _20sdp, end = _20sdp,
                     top = _5sdp, bottom = _5sdp
                 ),
-            color = Color.Black,
+            color = fontColor,
             fontSize = _12ssp,
             fontFamily = FontFamily(Font(R.font.poppins_regular))
         )

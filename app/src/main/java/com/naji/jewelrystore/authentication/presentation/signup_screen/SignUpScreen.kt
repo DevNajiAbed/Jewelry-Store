@@ -1,5 +1,6 @@
 package com.naji.jewelrystore.authentication.presentation.signup_screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,13 +17,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
@@ -37,19 +43,31 @@ import com.naji.jewelrystore.core.presenetation.components.DefaultButton
 import com.naji.jewelrystore.core.presenetation.components.DefaultTextField
 import com.naji.jewelrystore.core.presenetation.ui.theme.Primary
 import com.naji.jewelrystore.core.presenetation.ui.theme.Secondary
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignUpViewModel = hiltViewModel(),
+    navigateToHomeScreen: () -> Unit,
+    navigateToSignInScreen: () -> Unit,
+    onNavigationBarVisibilityChange: (Boolean) -> Unit
 ) {
+    // Hide the Navigation Bar
+    onNavigationBarVisibilityChange(false)
+
     val state = viewModel.state.collectAsState()
     val uiAction = viewModel.uiAction
 
     SignUpScreen(
         modifier = modifier,
         state = state,
-        onAction = viewModel::onAction
+        uiAction = uiAction,
+        onAction = viewModel::onAction,
+        navigateToHomeScreen = navigateToHomeScreen,
+        navigateToSignInScreen = navigateToSignInScreen,
+        onNavigationBarVisibilityChange = onNavigationBarVisibilityChange
     )
 }
 
@@ -57,8 +75,29 @@ fun SignUpScreen(
 private fun SignUpScreen(
     modifier: Modifier,
     state: State<SignUpScreenState>,
-    onAction: (SignUpScreenAction) -> Unit
+    uiAction: SharedFlow<SignUpViewModel. UiAction>,
+    onAction: (SignUpScreenAction) -> Unit,
+    navigateToHomeScreen: () -> Unit,
+    navigateToSignInScreen: () -> Unit,
+    onNavigationBarVisibilityChange: (Boolean) -> Unit
 ) {
+    val context = LocalContext.current
+
+    LaunchedEffect(true) { 
+        uiAction.collectLatest { action ->
+            when(action) {
+                is SignUpViewModel.UiAction.ShowToast -> {
+                    Toast.makeText(context, action.msg, Toast.LENGTH_SHORT).show()
+                }
+                SignUpViewModel.UiAction.OnSignUpSuccess -> {
+                    // Show the NavigationBar when we close SignUpScreen
+                    onNavigationBarVisibilityChange(true)
+                    navigateToHomeScreen()
+                }
+            }
+        }
+    }
+    
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
@@ -73,7 +112,8 @@ private fun SignUpScreen(
             passwordTitle,
             passwordField,
             signUpBtn,
-            signInSection
+            signInSection,
+            loadingIndicator
         ) = createRefs()
 
         val _100sdp = dimensionResource(com.intuit.sdp.R.dimen._100sdp)
@@ -83,6 +123,8 @@ private fun SignUpScreen(
         val _50sdp = dimensionResource(com.intuit.sdp.R.dimen._50sdp)
 
         val _12ssp = dimensionResource(com.intuit.ssp.R.dimen._12ssp).value.sp
+
+        val keyboardController = LocalSoftwareKeyboardController.current
 
         Image(
             painter = painterResource(R.drawable.logo),
@@ -184,7 +226,11 @@ private fun SignUpScreen(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Go
             ),
-            keyboardActions = KeyboardActions.Default,
+            keyboardActions = KeyboardActions(
+                onGo = {
+                    keyboardController?.hide()
+                }
+            ),
             modifier = Modifier
                 .constrainAs(passwordField) {
                     top.linkTo(passwordTitle.bottom)
@@ -195,6 +241,19 @@ private fun SignUpScreen(
                 .padding(_8sdp)
         )
 
+        if(state.value.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .constrainAs(loadingIndicator) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        top.linkTo(passwordField.bottom)
+                        bottom.linkTo(signUpBtn.top)
+                    },
+                color = Primary
+            )
+        }
+
         DefaultButton(
             modifier = Modifier
                 .constrainAs(signUpBtn) {
@@ -204,7 +263,8 @@ private fun SignUpScreen(
                 },
             text = "Sign up",
             onClick = {
-                onAction(SignUpScreenAction.PerformSignUp)
+                if(!state.value.isLoading)
+                    onAction(SignUpScreenAction.PerformSignUp)
             }
         )
 
@@ -230,7 +290,9 @@ private fun SignUpScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .clickable {
-
+                        // Show the NavigationBar when we close SignUpScreen
+                        onNavigationBarVisibilityChange(true)
+                        navigateToSignInScreen()
                     }
             )
         }

@@ -38,33 +38,45 @@ class SignInViewModel @Inject constructor(
                 }
             }
             SignInScreenAction.PerformSignIn -> {
-                viewModelScope.launch {
-                    signInUseCase(
-                        _state.value.username,
-                        _state.value.password
-                    ).collectLatest {
-                        when(it) {
-                            is Result.Success -> {
-                                _state.update { value ->
-                                    value.copy(isLoading = false)
-                                }
-                                _uiAction.emit(UiAction.OnSignInSuccess)
-                            }
-                            is Result.Failure -> {
-                                val msg = it.msg ?: "Something went wrong. Try again later."
-                                _state.update { value ->
-                                    value.copy(
-                                        isLoading = false,
-                                        error = msg
-                                    )
-                                }
-                                _uiAction.emit(UiAction.OnSignInFailure(msg))
-                            }
-                            is Result.Loading -> {
-                                _state.update { value ->
-                                    value.copy(isLoading = true)
-                                }
-                            }
+                performSignIn()
+            }
+        }
+    }
+
+    private fun performSignIn() {
+        viewModelScope.launch {
+            if(_state.value.username.isBlank()) {
+                _uiAction.emit(UiAction.ShowToast("Username cannot be empty"))
+                return@launch
+            }
+            if(_state.value.password.isBlank()) {
+                _uiAction.emit(UiAction.ShowToast("Password cannot be empty"))
+                return@launch
+            }
+            signInUseCase(
+                _state.value.username,
+                _state.value.password
+            ).collectLatest {
+                when(it) {
+                    is Result.Success -> {
+                        _state.update { value ->
+                            value.copy(isLoading = false)
+                        }
+                        _uiAction.emit(UiAction.OnSignInSuccess)
+                    }
+                    is Result.Failure -> {
+                        val msg = it.msg ?: "Something went wrong. Try again later."
+                        _state.update { value ->
+                            value.copy(
+                                isLoading = false,
+                                error = msg
+                            )
+                        }
+                        _uiAction.emit(UiAction.ShowToast(msg))
+                    }
+                    is Result.Loading -> {
+                        _state.update { value ->
+                            value.copy(isLoading = true)
                         }
                     }
                 }
@@ -72,8 +84,8 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    sealed class UiAction {
-        data object OnSignInSuccess : UiAction()
-        data class OnSignInFailure(val message: String) : UiAction()
+    sealed interface UiAction {
+        data class ShowToast(val message: String) : UiAction
+        data object OnSignInSuccess : UiAction
     }
 }

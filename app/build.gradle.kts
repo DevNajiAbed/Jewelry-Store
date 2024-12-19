@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.google.devtools.ksp)
     alias(libs.plugins.google.dagger.hilt.android)
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -69,9 +70,12 @@ dependencies {
     implementation(libs.sdp.android)
     implementation(libs.ssp.android)
 
-    // hilt
+    // Hilt
     implementation(libs.dagger.hilt)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation)
     implementation(libs.androidx.navigation.runtime.ktx)
+
+    // Kotlinx-Serialization
+    implementation(libs.kotlinx.serialization)
 }
