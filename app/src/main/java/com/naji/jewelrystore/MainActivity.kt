@@ -14,7 +14,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,16 +21,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.naji.jewelrystore.authentication.presentation.sign_in_screen.SignInScreen
+import com.naji.jewelrystore.authentication.presentation.signup_screen.SignUpScreen
+import com.naji.jewelrystore.core.presenetation.navigation.Route
 import com.naji.jewelrystore.core.presenetation.ui.theme.JewelryStoreTheme
 import com.naji.jewelrystore.jewelry.presentation.home_screen.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
-import com.naji.jewelrystore.core.presenetation.navigation.Route
-import com.naji.jewelrystore.authentication.presentation.sign_in_screen.SignInScreen
-import com.naji.jewelrystore.authentication.presentation.signup_screen.SignUpScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
