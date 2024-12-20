@@ -12,10 +12,7 @@ class SignUpUserUseCase @Inject constructor(
 ) {
     operator fun invoke(user: User): Flow<Result<Boolean>> = flow {
         emit(Result.Loading())
-        when(val result = authenticationRepository.signUp(user)) {
-            is Result.Success -> emit(result)
-            is Result.Failure -> emit(result)
-            is Result.Loading -> Unit
-        }
+        val result = authenticationRepository.signUp(user)
+        emit(result)
     }
 }

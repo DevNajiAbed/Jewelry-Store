@@ -76,7 +76,10 @@ class SignUpViewModel @Inject constructor(
                 when (it) {
                     is Result.Success -> {
                         _state.update { value ->
-                            value.copy(isLoading = false)
+                            value.copy(
+                                isLoading = false,
+                                error = ""
+                            )
                         }
                         _uiAction.emit(UiAction.OnSignUpSuccess)
                     }

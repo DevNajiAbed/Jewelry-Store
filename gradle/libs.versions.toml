@@ -1,5 +1,6 @@
 [versions]
 agp = "8.7.3"
+coilCompose = "2.4.0"
 constraintlayoutCompose = "1.1.0"
 hilt = "2.51.1"
 hiltNavigaion = "1.2.0"
@@ -23,6 +24,7 @@ sspAndroid = "1.1.1"
 [libraries]
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 dagger-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigaion"}

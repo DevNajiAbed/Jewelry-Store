@@ -26,7 +26,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -53,10 +52,10 @@ fun SignInScreen(
     viewModel: SignInViewModel = hiltViewModel(),
     navigateToHomeScreen: () -> Unit = {},
     navigateToSignUpScreen: () -> Unit = {},
-    onNavigationBarVisibilityChange: (Boolean) -> Unit
+    changeNavigationBarVisibility: (Boolean) -> Unit
 ) {
     // Hide the NavigationBar
-    onNavigationBarVisibilityChange(false)
+    changeNavigationBarVisibility(false)
 
     val state = viewModel.state.collectAsState()
     val uiAction = viewModel.uiAction
@@ -68,7 +67,7 @@ fun SignInScreen(
         onAction = viewModel::onAction,
         navigateToHomeScreen = navigateToHomeScreen,
         navigateToSignUpScreen = navigateToSignUpScreen,
-        onNavigationBarVisibilityChange = onNavigationBarVisibilityChange
+        onNavigationBarVisibilityChange = changeNavigationBarVisibility
     )
 }
 

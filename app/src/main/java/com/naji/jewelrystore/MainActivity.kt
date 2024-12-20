@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -21,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -71,7 +74,7 @@ class MainActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = Route.SignInScreen) {
+                    NavHost(navController = navController, startDestination = Route.HomeScreen) {
                         composable<Route.SignInScreen> {
                             SignInScreen(
                                 modifier = Modifier.padding(innerPadding),
@@ -81,7 +84,7 @@ class MainActivity : ComponentActivity() {
                                 navigateToSignUpScreen = {
                                     navController.navigate(Route.SignUpScreen)
                                 },
-                                onNavigationBarVisibilityChange = {
+                                changeNavigationBarVisibility = {
                                     showNavigationBar = it
                                 }
                             )
@@ -95,15 +98,18 @@ class MainActivity : ComponentActivity() {
                                 navigateToSignInScreen = {
                                     navController.navigateUp()
                                 },
-                                onNavigationBarVisibilityChange = {
+                                changeNavigationBarVisibility = {
                                     showNavigationBar = it
                                 }
                             )
-                            composable<Route.HomeScreen> {
-                                HomeScreen(
-                                    modifier = Modifier.padding(innerPadding)
-                                )
-                            }
+                        }
+                        composable<Route.HomeScreen> {
+                            HomeScreen(
+                                modifier = Modifier.padding(innerPadding),
+                                navigateToProductsScreen = { categoryName, categoryId ->
+
+                                }
+                            )
                         }
                     }
                 }
@@ -120,13 +126,8 @@ class MainActivity : ComponentActivity() {
                 alwaysShowLabel = false
             ),
             NavigationItem(
-                label = "",
-                icon = Icons.Rounded.Home,
-                alwaysShowLabel = false
-            ),
-            NavigationItem(
-                label = "Home",
-                icon = Icons.Rounded.Home,
+                label = "Shopping Cart",
+                icon = ImageVector.vectorResource(R.drawable.ic_shopping_cart),
                 alwaysShowLabel = false
             )
         )
