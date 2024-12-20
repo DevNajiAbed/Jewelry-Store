@@ -8,14 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -41,9 +41,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             JewelryStoreTheme {
+                val viewModel: MainViewModel = viewModel()
+
                 val navigationItems = getNavigationItems()
-                var selectedIndex by remember { mutableIntStateOf(0) }
-                var showNavigationBar by remember { mutableStateOf(true) }
+                val selectedIndex by viewModel.selectedIndex.collectAsState()
+                val showNavigationBar by viewModel.showNavigationBar.collectAsState()
 
                 Scaffold(
                     modifier = Modifier
@@ -64,7 +66,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                         },
                                         onClick = {
-                                            selectedIndex = index
+                                            viewModel.onAction(MainActivityAction.ChangeSelectedIndex(index))
                                         },
                                         alwaysShowLabel = item.alwaysShowLabel
                                     )
@@ -85,7 +87,7 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(Route.SignUpScreen)
                                 },
                                 changeNavigationBarVisibility = {
-                                    showNavigationBar = it
+                                    viewModel.onAction(MainActivityAction.ChangeNavigationBarVisibility(it))
                                 }
                             )
                         }
@@ -99,7 +101,7 @@ class MainActivity : ComponentActivity() {
                                     navController.navigateUp()
                                 },
                                 changeNavigationBarVisibility = {
-                                    showNavigationBar = it
+                                    viewModel.onAction(MainActivityAction.ChangeNavigationBarVisibility(it))
                                 }
                             )
                         }

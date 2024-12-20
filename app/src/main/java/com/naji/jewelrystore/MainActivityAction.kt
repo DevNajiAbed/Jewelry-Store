@@ -1,4 +1,6 @@
 package com.naji.jewelrystore
 
-class MainActivityAction {
+sealed interface MainActivityAction {
+    data class ChangeSelectedIndex(val index: Int) : MainActivityAction
+    data class ChangeNavigationBarVisibility(val isVisible: Boolean) : MainActivityAction
 }
