@@ -40,8 +40,11 @@ import kotlinx.coroutines.flow.collectLatest
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = hiltViewModel(),
-    navigateToProductsScreen: (categoryName: String, categoryId: String) -> Unit
+    navigateToProductsScreen: (categoryName: String, categoryId: String) -> Unit,
+    changeNavigationBarVisibility: (Boolean) -> Unit
 ) {
+    changeNavigationBarVisibility(true)
+
     val state by viewModel.state.collectAsState()
     val uiAction = viewModel.uiAction
 

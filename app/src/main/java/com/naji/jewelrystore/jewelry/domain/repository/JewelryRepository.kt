@@ -8,4 +8,9 @@ interface JewelryRepository {
     suspend fun getAllCategories(): Result<List<Category>>
 
     suspend fun getAllProductsOfCategory(categoryId: String): Result<List<Product>>
+
+    suspend fun addProductToShoppingCart(
+        userId: String,
+        productId: String
+    ) : Result<Boolean>
 }

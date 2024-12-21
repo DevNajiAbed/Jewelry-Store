@@ -11,4 +11,10 @@ sealed interface Route {
 
     @Serializable
     data object HomeScreen : Route
+
+    @Serializable
+    data class ProductsScreen(
+        val categoryName: String,
+        val categoryId: String
+    ) : Route
 }

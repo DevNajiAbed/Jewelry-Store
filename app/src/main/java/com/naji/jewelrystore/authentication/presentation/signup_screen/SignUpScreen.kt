@@ -89,8 +89,6 @@ private fun SignUpScreen(
                     Toast.makeText(context, action.msg, Toast.LENGTH_SHORT).show()
                 }
                 SignUpViewModel.UiAction.OnSignUpSuccess -> {
-                    // Show the NavigationBar when we close SignUpScreen
-                    onNavigationBarVisibilityChange(true)
                     navigateToHomeScreen()
                 }
             }
@@ -289,8 +287,6 @@ private fun SignUpScreen(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .clickable {
-                        // Show the NavigationBar when we close SignUpScreen
-                        onNavigationBarVisibilityChange(true)
                         navigateToSignInScreen()
                     }
             )

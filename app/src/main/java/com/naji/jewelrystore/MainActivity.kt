@@ -16,10 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -27,11 +23,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.naji.jewelrystore.authentication.presentation.sign_in_screen.SignInScreen
 import com.naji.jewelrystore.authentication.presentation.signup_screen.SignUpScreen
 import com.naji.jewelrystore.core.presenetation.navigation.Route
 import com.naji.jewelrystore.core.presenetation.ui.theme.JewelryStoreTheme
 import com.naji.jewelrystore.jewelry.presentation.home_screen.HomeScreen
+import com.naji.jewelrystore.jewelry.presentation.products_screen.ProductsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -51,32 +49,17 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxSize(),
                     bottomBar = {
-                        NavigationBar {
-                            if(showNavigationBar) {
-                                navigationItems.forEachIndexed { index, item ->
-                                    NavigationBarItem(
-                                        selected = selectedIndex == index,
-                                        label = {
-                                            Text(text = item.label)
-                                        },
-                                        icon = {
-                                            Icon(
-                                                imageVector = item.icon,
-                                                contentDescription = item.label
-                                            )
-                                        },
-                                        onClick = {
-                                            viewModel.onAction(MainActivityAction.ChangeSelectedIndex(index))
-                                        },
-                                        alwaysShowLabel = item.alwaysShowLabel
-                                    )
-                                }
-                            }
+                        if (showNavigationBar) {
+                            JewelryNavigationBar(
+                                navigationItems,
+                                selectedIndex,
+                                viewModel
+                            )
                         }
                     }
                 ) { innerPadding ->
                     val navController = rememberNavController()
-                    NavHost(navController = navController, startDestination = Route.HomeScreen) {
+                    NavHost(navController = navController, startDestination = Route.SignInScreen) {
                         composable<Route.SignInScreen> {
                             SignInScreen(
                                 modifier = Modifier.padding(innerPadding),
@@ -87,7 +70,11 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(Route.SignUpScreen)
                                 },
                                 changeNavigationBarVisibility = {
-                                    viewModel.onAction(MainActivityAction.ChangeNavigationBarVisibility(it))
+                                    viewModel.onAction(
+                                        MainActivityAction.ChangeNavigationBarVisibility(
+                                            it
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -101,7 +88,11 @@ class MainActivity : ComponentActivity() {
                                     navController.navigateUp()
                                 },
                                 changeNavigationBarVisibility = {
-                                    viewModel.onAction(MainActivityAction.ChangeNavigationBarVisibility(it))
+                                    viewModel.onAction(
+                                        MainActivityAction.ChangeNavigationBarVisibility(
+                                            it
+                                        )
+                                    )
                                 }
                             )
                         }
@@ -109,12 +100,59 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(
                                 modifier = Modifier.padding(innerPadding),
                                 navigateToProductsScreen = { categoryName, categoryId ->
-
+                                    navController.navigate(
+                                        Route.ProductsScreen(
+                                            categoryName,
+                                            categoryId
+                                        )
+                                    )
+                                },
+                                changeNavigationBarVisibility = {
+                                    viewModel.onAction(MainActivityAction.ChangeNavigationBarVisibility(it))
                                 }
+                            )
+                        }
+                        composable<Route.ProductsScreen> {
+                            val route = it.toRoute<Route.ProductsScreen>()
+                            ProductsScreen(
+                                categoryName = route.categoryName,
+                                categoryId = route.categoryId
                             )
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    private fun JewelryNavigationBar(
+        navigationItems: List<NavigationItem>,
+        selectedIndex: Int,
+        viewModel: MainViewModel
+    ) {
+        NavigationBar {
+            navigationItems.forEachIndexed { index, item ->
+                NavigationBarItem(
+                    selected = selectedIndex == index,
+                    label = {
+                        Text(text = item.label)
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = item.label
+                        )
+                    },
+                    onClick = {
+                        viewModel.onAction(
+                            MainActivityAction.ChangeSelectedIndex(
+                                index
+                            )
+                        )
+                    },
+                    alwaysShowLabel = item.alwaysShowLabel
+                )
             }
         }
     }
@@ -135,7 +173,7 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    data class NavigationItem(
+    private data class NavigationItem(
         val label: String,
         val icon: ImageVector,
         val alwaysShowLabel: Boolean

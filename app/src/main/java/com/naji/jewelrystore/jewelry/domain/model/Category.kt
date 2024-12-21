@@ -4,7 +4,7 @@ import com.google.firebase.firestore.DocumentId
 
 data class Category(
     @DocumentId
-    val id: String? = null,
+    var id: String? = null,
     val name: String,
     val imgUrl: String
 )

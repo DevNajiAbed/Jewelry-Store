@@ -8,6 +8,7 @@ object Constants {
                 const val FIELD_EMAIL = "email"
                 const val FIELD_USERNAME = "username"
                 const val FIELD_PASSWORD = "password"
+                const val FIELD_SHOPPING_CART_LIST = "shoppingCartList"
             }
         }
         class Categories : Collection {
