@@ -66,8 +66,7 @@ fun SignInScreen(
         uiAction = uiAction,
         onAction = viewModel::onAction,
         navigateToHomeScreen = navigateToHomeScreen,
-        navigateToSignUpScreen = navigateToSignUpScreen,
-        onNavigationBarVisibilityChange = changeNavigationBarVisibility
+        navigateToSignUpScreen = navigateToSignUpScreen
     )
 }
 
@@ -78,8 +77,7 @@ private fun SignInScreen(
     uiAction: SharedFlow<SignInViewModel.UiAction>,
     onAction: (SignInScreenAction) -> Unit,
     navigateToHomeScreen: () -> Unit,
-    navigateToSignUpScreen: () -> Unit,
-    onNavigationBarVisibilityChange: (Boolean) -> Unit
+    navigateToSignUpScreen: () -> Unit
 ) {
     val context = LocalContext.current
 

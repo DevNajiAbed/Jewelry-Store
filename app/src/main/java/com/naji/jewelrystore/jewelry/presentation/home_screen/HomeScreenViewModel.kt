@@ -3,6 +3,7 @@ package com.naji.jewelrystore.jewelry.presentation.home_screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.naji.jewelrystore.core.data.Result
+import com.naji.jewelrystore.core.domain.use_cases.RemoveLocalUserDataUseCase
 import com.naji.jewelrystore.jewelry.domain.use_cases.GetAllCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val getAllCategoriesUseCase: GetAllCategoriesUseCase
+    private val getAllCategoriesUseCase: GetAllCategoriesUseCase,
+    private val removeLocalUserDataUseCase: RemoveLocalUserDataUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeScreenState())
@@ -43,6 +45,14 @@ class HomeScreenViewModel @Inject constructor(
                     )
                 }
             }
+
+            HomeScreenAction.SignOut -> {
+                removeLocalUserDataUseCase()
+                viewModelScope.launch {
+                    _uiAction.emit(UiAction.ShowToast("Signing out..."))
+                    _uiAction.emit(UiAction.NavigateToSignInScreen)
+                }
+            }
         }
     }
 
@@ -60,9 +70,14 @@ class HomeScreenViewModel @Inject constructor(
                         } ?: state.copy(
                             isLoading = false,
                             error = "Something went wrong. Try again later"
-                        )
+                        ).also {
+                            _uiAction.emit(
+                                UiAction.ShowToast(
+                                    result.msg ?: "Something went wrong. Try again later"
+                                )
+                            )
+                        }
                     }
-                    _uiAction.emit(UiAction.ShowToast("Something went wrong. Try again later"))
                 }
 
                 is Result.Failure -> {
@@ -72,7 +87,11 @@ class HomeScreenViewModel @Inject constructor(
                             error = result.msg ?: "Something went wrong. Try again later"
                         )
                     }
-                    _uiAction.emit(UiAction.ShowToast("Something went wrong. Try again later"))
+                    _uiAction.emit(
+                        UiAction.ShowToast(
+                            result.msg ?: "Something went wrong. Try again later"
+                        )
+                    )
                 }
 
                 is Result.Loading -> {
@@ -85,9 +104,13 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     sealed interface UiAction {
-        data class NavigateToCategoryProducts(val categoryName: String, val categoryId: String) :
-            UiAction
+        data class NavigateToCategoryProducts(
+            val categoryName: String,
+            val categoryId: String
+        ) : UiAction
 
         data class ShowToast(val msg: String) : UiAction
+
+        data object NavigateToSignInScreen : UiAction
     }
 }

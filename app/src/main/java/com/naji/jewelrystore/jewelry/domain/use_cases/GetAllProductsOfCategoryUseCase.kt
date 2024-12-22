@@ -1,8 +1,8 @@
 package com.naji.jewelrystore.jewelry.domain.use_cases
 
 import com.naji.jewelrystore.core.data.Result
-import com.naji.jewelrystore.jewelry.domain.model.Product
-import com.naji.jewelrystore.jewelry.domain.repository.JewelryRepository
+import com.naji.jewelrystore.core.domain.model.Product
+import com.naji.jewelrystore.core.domain.repository.JewelryRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

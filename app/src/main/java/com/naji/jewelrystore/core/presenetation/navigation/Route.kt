@@ -17,4 +17,7 @@ sealed interface Route {
         val categoryName: String,
         val categoryId: String
     ) : Route
+
+    @Serializable
+    data object ShoppingCartScreen : Route
 }

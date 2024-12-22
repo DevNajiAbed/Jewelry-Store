@@ -1,9 +1,11 @@
 package com.naji.jewelrystore.authentication.presentation.sign_in_screen
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.naji.jewelrystore.authentication.domain.use_cases.SignInUseCase
 import com.naji.jewelrystore.core.data.Result
+import com.naji.jewelrystore.core.domain.use_cases.SaveLocalUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-    private val signInUseCase: SignInUseCase
+    private val signInUseCase: SignInUseCase,
+    private val saveLocalUserDataUseCase: SaveLocalUserDataUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SignInScreenState())
@@ -65,6 +68,7 @@ class SignInViewModel @Inject constructor(
                                 error = ""
                             )
                         }
+                        saveLocalUserDataUseCase(it.data!!)
                         _uiAction.emit(UiAction.OnSignInSuccess)
                     }
                     is Result.Failure -> {

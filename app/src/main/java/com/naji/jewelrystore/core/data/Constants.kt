@@ -24,6 +24,7 @@ object Constants {
                 const val FIELD_NAME = "name"
                 const val FIELD_IMAGE_URL = "imageUrl"
                 const val FIELD_PRICE = "price"
+                const val CATEGORY_ID = "categoryId"
             }
         }
     }

@@ -10,8 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ExitToApp
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -21,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -31,6 +37,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.naji.jewelrystore.core.presenetation.components.DefaultButton
+import com.naji.jewelrystore.core.presenetation.ui.theme.Primary
 import com.naji.jewelrystore.core.presenetation.ui.theme.Secondary
 import com.naji.jewelrystore.jewelry.presentation.home_screen.components.CategoryItem
 import kotlinx.coroutines.flow.SharedFlow
@@ -41,7 +48,9 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = hiltViewModel(),
     navigateToProductsScreen: (categoryName: String, categoryId: String) -> Unit,
-    changeNavigationBarVisibility: (Boolean) -> Unit
+    changeNavigationBarVisibility: (Boolean) -> Unit,
+    popBackStack: () -> Unit,
+    navigateToSignInScreen: () -> Unit
 ) {
     changeNavigationBarVisibility(true)
 
@@ -53,7 +62,9 @@ fun HomeScreen(
         state = state,
         uiAction = uiAction,
         onAction = viewModel::onAction,
-        navigateToProductsScreen = navigateToProductsScreen
+        navigateToProductsScreen = navigateToProductsScreen,
+        popBackStack = popBackStack,
+        navigateToSignInScreen = navigateToSignInScreen
     )
 }
 
@@ -63,7 +74,9 @@ private fun HomeScreen(
     state: HomeScreenState,
     uiAction: SharedFlow<HomeScreenViewModel.UiAction>,
     onAction: (HomeScreenAction) -> Unit,
-    navigateToProductsScreen: (categoryName: String, categoryId: String) -> Unit
+    navigateToProductsScreen: (categoryName: String, categoryId: String) -> Unit,
+    popBackStack: () -> Unit,
+    navigateToSignInScreen: () -> Unit
 ) {
     val _32sdp = dimensionResource(com.intuit.sdp.R.dimen._32sdp)
     val _24sdp = dimensionResource(com.intuit.sdp.R.dimen._24sdp)
@@ -72,6 +85,7 @@ private fun HomeScreen(
 
     val _32ssp = dimensionResource(com.intuit.ssp.R.dimen._32ssp).value.sp
     val _12ssp = dimensionResource(com.intuit.ssp.R.dimen._12ssp).value.sp
+    val _10ssp = dimensionResource(com.intuit.ssp.R.dimen._10ssp).value.sp
 
     val context = LocalContext.current
 
@@ -85,6 +99,11 @@ private fun HomeScreen(
                 is HomeScreenViewModel.UiAction.ShowToast -> {
                     Toast.makeText(context, action.msg, Toast.LENGTH_SHORT).show()
                 }
+
+                HomeScreenViewModel.UiAction.NavigateToSignInScreen -> {
+                    popBackStack()
+                    navigateToSignInScreen()
+                }
             }
         }
     }
@@ -95,80 +114,124 @@ private fun HomeScreen(
             .background(Secondary.copy(alpha = 0.75f))
     ) {
         val (
-            notificationIcon,
+            loadingIndicator,
+            signOutBtn,
+            notificationBtn,
             topSection,
             categoryList
         ) = createRefs()
 
-        IconButton(
-            onClick = {},
-            modifier = Modifier
-                .constrainAs(notificationIcon) {
-                    end.linkTo(parent.end, margin = _16sdp)
-                    top.linkTo(parent.top, margin = _16sdp)
-                }
-        ) {
-            Icon(
+        if (state.isLoading) {
+            CircularProgressIndicator(
                 modifier = Modifier
-                    .size(_24sdp),
-                imageVector = Icons.Rounded.Notifications,
-                contentDescription = "Notifications",
-                tint = Color(0xFFCC6363)
+                    .constrainAs(loadingIndicator) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                    },
+                color = Primary
             )
-        }
-
-        Row(
-            modifier = Modifier
-                .constrainAs(topSection) {
-                    top.linkTo(notificationIcon.bottom, margin = _8sdp)
-                    start.linkTo(parent.start, margin = _16sdp)
-                    end.linkTo(parent.end, margin = _16sdp)
-                    width = Dimension.fillToConstraints
-                },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = "Explore",
-                    fontSize = _32ssp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Best categories for you",
-                    fontSize = _12ssp
+        } else {
+            IconButton(
+                onClick = {},
+                modifier = Modifier
+                    .constrainAs(notificationBtn) {
+                        end.linkTo(parent.end, margin = _16sdp)
+                        top.linkTo(parent.top, margin = _16sdp)
+                    }
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(_24sdp),
+                    imageVector = Icons.Rounded.Notifications,
+                    contentDescription = "Notifications",
+                    tint = Color(0xFFCC6363)
                 )
             }
-            DefaultButton(
-                onClick = {},
-                text = "All Products",
-                fontColor = Color.White,
-                backgroundColor = Color(0xFFCC6363)
-            )
-        }
 
-
-        LazyColumn(
-            modifier = Modifier
-                .constrainAs(categoryList) {
-                    top.linkTo(topSection.bottom, margin = _32sdp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                    width = Dimension.fillToConstraints
-                    height = Dimension.fillToConstraints
+            IconButton(
+                onClick = {
+                    onAction(HomeScreenAction.SignOut)
                 },
-            verticalArrangement = Arrangement.spacedBy(_16sdp)
-        ) {
-            items(state.categories) { category ->
-                CategoryItem(
-                    category = category,
-                    modifier = Modifier
-                        .padding(horizontal = _16sdp),
-                    onItemClick = {
-                        onAction(HomeScreenAction.OnCategorySelected(it))
+                modifier = Modifier
+                    .constrainAs(signOutBtn) {
+                        start.linkTo(parent.start, margin = _16sdp)
+                        top.linkTo(parent.top, margin = _16sdp)
                     }
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(_24sdp),
+                    imageVector = Icons.AutoMirrored.Rounded.ExitToApp,
+                    contentDescription = "Notifications",
+                    tint = Color(0xFFCC6363)
                 )
+            }
+
+            Row(
+                modifier = Modifier
+                    .constrainAs(topSection) {
+                        top.linkTo(notificationBtn.bottom, margin = _8sdp)
+                        start.linkTo(parent.start, margin = _16sdp)
+                        end.linkTo(parent.end, margin = _16sdp)
+                        width = Dimension.fillToConstraints
+                    },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = "Explore",
+                        fontSize = _32ssp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Best categories for you",
+                        fontSize = _12ssp
+                    )
+                }
+
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFCC6363)
+                    ),
+                    shape = RoundedCornerShape(_8sdp)
+                ) {
+                    Text(
+                        text = "All Products",
+                        color = Color.White,
+                        modifier = Modifier
+                            .padding(horizontal = _8sdp),
+                        fontSize = _10ssp
+                    )
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier
+                    .padding(vertical = _8sdp)
+                    .constrainAs(categoryList) {
+                        top.linkTo(topSection.bottom, margin = _8sdp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                        width = Dimension.fillToConstraints
+                        height = Dimension.fillToConstraints
+                    },
+                verticalArrangement = Arrangement.spacedBy(_8sdp)
+            ) {
+                items(state.categories) { category ->
+                    CategoryItem(
+                        category = category,
+                        modifier = Modifier
+                            .padding(horizontal = _16sdp),
+                        onItemClick = {
+                            onAction(HomeScreenAction.OnCategorySelected(it))
+                        }
+                    )
+                }
             }
         }
     }

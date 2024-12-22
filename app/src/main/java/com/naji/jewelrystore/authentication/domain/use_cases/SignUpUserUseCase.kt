@@ -10,7 +10,7 @@ import javax.inject.Inject
 class SignUpUserUseCase @Inject constructor(
     private val authenticationRepository: AuthenticationRepository
 ) {
-    operator fun invoke(user: User): Flow<Result<Boolean>> = flow {
+    operator fun invoke(user: User): Flow<Result<String>> = flow {
         emit(Result.Loading())
         val result = authenticationRepository.signUp(user)
         emit(result)

@@ -12,28 +12,7 @@ import kotlinx.coroutines.tasks.await
 class AuthenticationRepositoryImpl : AuthenticationRepository {
     private val firestore = Firebase.firestore
 
-    override suspend fun signIn(username: String, password: String): Result<Boolean> {
-        /*return suspendCancellableCoroutine { continuation ->
-            firestore.collection(Constants.COLLECTION_USERS)
-                .where(
-                    Filter.and(
-                        Filter.equalTo(Constants.FIELD_USERNAME, username),
-                        Filter.equalTo(Constants.FIELD_PASSWORD, password)
-                    )
-                ).get()
-                .addOnSuccessListener {
-                    if (it.size() > 0)
-                        continuation.resume(Result.Success(true))
-                    else
-                        continuation.resume(Result.Failure("User not found"))
-                }.addOnFailureListener {
-                    continuation.resume(
-                        Result.Failure(
-                            it.localizedMessage ?: "Something went wrong. Try again later"
-                        )
-                    )
-                }
-        }*/
+    override suspend fun signIn(username: String, password: String): Result<String> {
         return try {
             val querySnapshot = firestore.collection(Constants.Collection.Users.COLLECTION_NAME)
                 .where(
@@ -47,13 +26,15 @@ class AuthenticationRepositoryImpl : AuthenticationRepository {
             if(querySnapshot.size() == 0)
                 return Result.Failure("Error in username or password")
 
-            Result.Success(true)
+            val userId = querySnapshot.documents[0].id
+
+            Result.Success(userId)
         } catch (e: Exception) {
             Result.Failure(e.localizedMessage ?: "Something went wrong. Try again later")
         }
     }
 
-    override suspend fun signUp(user: User): Result<Boolean> {
+    override suspend fun signUp(user: User): Result<String> {
         return try {
             val querySnapshot = firestore.collection(Constants.Collection.Users.COLLECTION_NAME)
                 .whereEqualTo(Constants.Collection.Users.FIELD_EMAIL, user.email)
@@ -64,10 +45,13 @@ class AuthenticationRepositoryImpl : AuthenticationRepository {
                 return Result.Failure("This email already exists")
             }
 
-            firestore.collection(Constants.Collection.Users.COLLECTION_NAME)
+            val documentRef = firestore.collection(Constants.Collection.Users.COLLECTION_NAME)
                 .add(user)
                 .await()
-            Result.Success(true)
+
+            val userId = documentRef.id
+
+            Result.Success(userId)
         } catch (e: Exception) {
             Result.Failure(e.localizedMessage ?: "Something went wrong. Try again later")
         }

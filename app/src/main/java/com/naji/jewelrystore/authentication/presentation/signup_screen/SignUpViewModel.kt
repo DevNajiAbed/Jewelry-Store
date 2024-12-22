@@ -1,10 +1,12 @@
 package com.naji.jewelrystore.authentication.presentation.signup_screen
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.naji.jewelrystore.authentication.domain.use_cases.SignUpUserUseCase
 import com.naji.jewelrystore.core.domain.model.User
 import com.naji.jewelrystore.core.data.Result
+import com.naji.jewelrystore.core.domain.use_cases.SaveLocalUserDataUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +19,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val signUpUserUseCase: SignUpUserUseCase
+    private val signUpUserUseCase: SignUpUserUseCase,
+    private val application: Application,
+    private val saveLocalUserDataUseCase: SaveLocalUserDataUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SignUpScreenState())
@@ -81,6 +85,7 @@ class SignUpViewModel @Inject constructor(
                                 error = ""
                             )
                         }
+                        saveLocalUserDataUseCase(it.data!!)
                         _uiAction.emit(UiAction.OnSignUpSuccess)
                     }
 

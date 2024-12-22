@@ -27,13 +27,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.naji.jewelrystore.R
-import com.naji.jewelrystore.jewelry.domain.model.Product
+import com.naji.jewelrystore.core.domain.model.Product
 
 @Composable
 fun ProductItem(
     modifier: Modifier = Modifier,
     product: Product,
-    addToShoppingCart: (productId: String) -> Unit
+    addToShoppingCart: (productId: String, categoryId: String) -> Unit
 ) {
     val _80sdp = dimensionResource(com.intuit.sdp.R.dimen._80sdp)
     val _8sdp = dimensionResource(com.intuit.sdp.R.dimen._8sdp)
@@ -73,7 +73,9 @@ fun ProductItem(
                 color = Color.Black
             )
         }
-        IconButton(onClick = { addToShoppingCart(product.id!!) }) {
+        IconButton(onClick = {
+            addToShoppingCart(product.id!!, product.categoryId)
+        }) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_shopping_cart),
                 contentDescription = "Add to cart"
@@ -86,7 +88,7 @@ fun ProductItem(
 @Composable
 private fun PreviewProductItem() {
     ProductItem(
-        product = Product(name = "Ring", imageUrl = "", price = 343f),
-        addToShoppingCart = {}
+        product = Product(name = "Ring", imageUrl = "", price = 343f, categoryId = ""),
+        addToShoppingCart = { _, _ -> }
     )
 }
